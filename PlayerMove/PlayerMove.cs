@@ -23,7 +23,7 @@ public class PlayerMove : MonoBehaviour
         moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));//Atribui as teclas pré programadas de horizontal e vertical para se movimentar em x e y
         Vector3 moveHorizontal = transform.up * -moveInput.x; //cria um vetor de três dimensões para que o player, ao rodar de direção, mude a referência de onde está o lado dele; "-" indica oposto do lado;    
         Vector3 moveVertical = transform.right * moveInput.y; //Idem, para o outro eixo;
-        rb.velocity = (moveHorizontal * moveVertical) * moveSpeed; //Set a velocidade do player;
+        rb.velocity = (moveHorizontal + moveVertical) * moveSpeed; //Set a velocidade do player;
 
     }
 }
