@@ -31,30 +31,30 @@ extends CharacterBody3D
 #Tutorial
 @onready var tutorial_walk = $PlayerHUD/TutorialGuide/TutorialWalk #animação de tutorial
 @onready var tutorial_guide = $PlayerHUD/TutorialGuide  #UI que mostra a animação de tutorial
-
 @onready var win_platform : MeshInstance3D = get_tree().get_first_node_in_group("finishphase") #Instância da Plataforma para detectar colisão
+@onready var tutorial_ui = $PlayerHUD/Tutorial_UI #nó que contém a caixa de diálogo do tutorial
+@onready var speech_tutorial = $PlayerHUD/Tutorial_UI/SpeechTutorial #Lugar aonde vai atualizar os textos
 
-
+#Constantes
 const vida_maxima = 10.0
 const MOUSE_SENS = 0.5
 const SPEED = 10.0
 const INCREASE_SPEED = 20
 var JUMP_FORCE = 5.0
 const GRAVITY = Vector3(0, -9.8, 0)
-
+#Booleanas
 var can_shoot = true
 var can_shoot_mf = false
 var can_shoot_nf = false
-
 var dead = false
+#Variáveis do Player
 var vida
-var is_firing = false
 var l_ammo = 20 #munição linfócito
 var m_ammo = 20 #munição macrófago
 var n_ammo = 50 #munição neutrófilo
 
 func _ready():
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED #altera o modo de captura do mouse para usar como FPS
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE #altera o modo de captura do mouse para usar como FPS
 	#Animações
 	animated_sprite_2d.animation_finished.connect(shoot_anim_done) #conecta a outra animação
 	damage_taken.animation_finished.connect(return_normalUI) #conecta á outra animação
@@ -66,7 +66,7 @@ func _ready():
 	player_life_bar.show()
 	#Física
 	set_physics_process(true)
-	get_tree().paused = false
+	get_tree().paused = true
 	$CollisionShape3D.disabled = false
 	#Músicas
 	death_sound.stop()#ao resetar, para a música de morte
@@ -80,6 +80,8 @@ func _ready():
 	can_shoot_mf = false
 	can_shoot_nf = false
 	
+
+	
 func _input(event):
 	if dead:
 		return
@@ -91,7 +93,7 @@ func _input(event):
 	if rotation_degrees.x < -90:
 		rotation_degrees.x = -90
 
-func _process(delta):
+func _process(_delta):
 	if dead:
 		return
 	progress_bar.value = vida	
@@ -99,6 +101,7 @@ func _process(delta):
 		restart()
 		
 	if Input.is_action_just_pressed("change_macrofage"):
+		neutrofile_sound.stop()
 		animated_sprite_2d.play("idle_macrofage")
 		animated_sprite_2d.animation_finished.disconnect(shoot_neutrofile_anim_done)
 		animated_sprite_2d.animation_finished.disconnect(shoot_anim_done)
@@ -109,6 +112,7 @@ func _process(delta):
 			can_shoot_nf = false
 
 	if Input.is_action_just_pressed("change_linfocit"):
+		neutrofile_sound.stop()
 		animated_sprite_2d.play("idle")
 		animated_sprite_2d.animation_finished.disconnect(shoot_neutrofile_anim_done)
 		animated_sprite_2d.animation_finished.disconnect(shoot_macrofage_anim_done)
@@ -119,6 +123,7 @@ func _process(delta):
 			can_shoot_nf = false
 	
 	if Input.is_action_just_pressed("change_neutrofile"):
+		neutrofile_sound.stop()
 		animated_sprite_2d.play("idle_neutro")
 		animated_sprite_2d.animation_finished.disconnect(shoot_anim_done)
 		animated_sprite_2d.animation_finished.disconnect(shoot_macrofage_anim_done)
@@ -140,18 +145,13 @@ func _process(delta):
 			if m_ammo == 0:
 				can_shoot_mf = false
 		if can_shoot_nf:
-			is_firing = !is_firing
-			
-			if is_firing:
-				flame_thrower_shoot.enabled = true
-				shoot_by_neutrofile()
-				n_ammo -= 4 
-				if n_ammo < 0:
-					n_ammo = 0
-				if n_ammo == 0:
-					can_shoot_nf = false
-				else:
-					flame_thrower_shoot.enabled = false
+			shoot_by_neutrofile()
+			n_ammo -= 4 
+			if n_ammo < 0:
+				n_ammo = 0
+			if n_ammo == 0:
+				can_shoot_nf = false
+				
 			
 				
 				
@@ -217,12 +217,11 @@ func shoot_by_macrofage():
 		macrofage_ray_3d.get_collider().kill_blue()
 
 func shoot_by_neutrofile():
-	if is_firing:
-		animated_sprite_2d.play("shoot_neutro")
-		neutrofile_sound.play()
-		if flame_thrower_shoot.is_colliding() and flame_thrower_shoot.get_collider().has_method("kill_red"):
-			flame_thrower_shoot.get_collider().kill_red()
-		
+	can_shoot_nf = true
+	if flame_thrower_shoot.is_colliding() and flame_thrower_shoot.get_collider().has_method("kill_red"):
+		flame_thrower_shoot.get_collider().kill_red()
+	animated_sprite_2d.play("shoot_neutro")
+	neutrofile_sound.play()
 
 func return_normalUI():
 	damage_taken.play("idle")
@@ -264,10 +263,10 @@ func _on_check_coliision_FinishLevel():
 		can_shoot = false
 		can_shoot_mf = false
 		disable_UI()
-		
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		get_tree().paused = true
 		phase_finished.show()
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		
 		
 func shoot_macrofage_anim_done():
 	animated_sprite_2d.play("idle_macrofage")
@@ -278,13 +277,11 @@ func shoot_anim_done():
 	can_shoot = true
 	
 func shoot_neutrofile_anim_done():
-	animated_sprite_2d.play("end_neutro")
+	animated_sprite_2d.play("idle_neutro")
 	can_shoot_nf = true
-	neutrofile_sound.stop()
 		
-	
 
-	
-
-	
-
+func _on_jump_tutorial_pressed():
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	get_tree().paused = false
+	tutorial_ui.hide()

@@ -90,7 +90,8 @@ animations = [{
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0of21"]
 margin = 2.871
-height = 2.54
+radius = 0.75
+height = 3.0
 
 [node name="Enemy" type="CharacterBody3D" groups=["enemy"]]
 collision_layer = 2
@@ -121,6 +122,7 @@ stream = ExtResource("4_r3ya0")
 bus = &"SFX"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.967815, 0)
 shape = SubResource("CapsuleShape3D_0of21")
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

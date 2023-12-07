@@ -65,7 +65,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_ligy3")
 shape = SubResource("ConcavePolygonShape3D_hdxyt")
 
 [node name="Player" parent="." groups=["player"] instance=ExtResource("2_25qut")]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 14.11, 13.242, -0.497)
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 26.4948, 5.09263, -0.0910552)
 platform_on_leave = 2
 platform_floor_layers = 4294901761
 platform_wall_layers = 1
@@ -102,6 +102,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.0948, 0, 22)
 
 [node name="Enemy6" parent="Enemies/EnemiesGroup1" instance=ExtResource("3_aiuty")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.9416, 0, -18)
+
+[node name="Enemy7" parent="Enemies/EnemiesGroup1" instance=ExtResource("3_aiuty")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -144.225, 6.10849, 3.62068)
 
 [node name="EnemiesGroup2" type="Node3D" parent="Enemies"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.5895)
